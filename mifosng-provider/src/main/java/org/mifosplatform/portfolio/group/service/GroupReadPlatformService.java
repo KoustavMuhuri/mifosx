@@ -11,6 +11,7 @@ import org.mifosplatform.infrastructure.core.data.PaginationParameters;
 import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.core.service.SearchParameters;
 import org.mifosplatform.portfolio.group.data.GroupGeneralData;
+import org.mifosplatform.portfolio.loanaccount.data.LoanAccountData;
 
 public interface GroupReadPlatformService {
 
@@ -25,4 +26,8 @@ public interface GroupReadPlatformService {
     Collection<GroupGeneralData> retrieveGroupsForLookup(Long officeId);
 
     GroupGeneralData retrieveGroupWithClosureReasons();
+
+    GroupGeneralData retrieveGroupAndMembersDetailsTemplate(Long groupId);
+    
+	
 }

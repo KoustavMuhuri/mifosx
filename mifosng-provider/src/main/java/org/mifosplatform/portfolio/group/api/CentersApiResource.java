@@ -56,6 +56,7 @@ import org.mifosplatform.portfolio.group.service.CenterReadPlatformService;
 import org.mifosplatform.infrastructure.core.service.SearchParameters;
 import org.mifosplatform.portfolio.meeting.data.MeetingData;
 import org.mifosplatform.portfolio.meeting.service.MeetingReadPlatformService;
+import org.mifosplatform.portfolio.savings.SavingsApiConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -248,6 +249,21 @@ public class CentersApiResource {
                 .build(); //
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return this.toApiJsonSerializer.serialize(result);
+    }
+    
+    @GET
+    @Path("{centerId}/clientdetails")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String template(@PathParam ("centerId") final Long centerId,
+            @Context final UriInfo uriInfo) {
+
+        this.context.authenticatedUser().validateHasReadPermission(GroupingTypesApiConstants.CENTER_RESOURCE_NAME);;
+
+       final CenterData clientDetailsForParticularcenter = this.centerReadPlatformService.retrieveCenterAndMembersDetailsTemplate(centerId);
+        
+        final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
+        return this.toApiJsonSerializer.serialize(settings, clientDetailsForParticularcenter, GroupingTypesApiConstants.CENTER_RESPONSE_DATA_PARAMETERS );
     }
 
     @POST

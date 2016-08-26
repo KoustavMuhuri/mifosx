@@ -1003,6 +1003,14 @@ public class CommandWrapperBuilder {
         this.href = "/savingsaccounts/template";
         return this;
     }
+    
+    public CommandWrapperBuilder createBulkSavings(){
+    	this.actionName="CREATE";
+    	this.entityName="BULKSAVINGS";
+    	this.entityId=null;
+    	this.href="/savingsaccounts/bulkSavingsSubmit";
+    	return this;
+    }
 
     public CommandWrapperBuilder updateSavingsAccount(final Long accountId) {
         this.actionName = "UPDATE";

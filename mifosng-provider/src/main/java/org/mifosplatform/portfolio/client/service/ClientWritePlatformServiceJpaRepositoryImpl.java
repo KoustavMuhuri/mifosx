@@ -273,6 +273,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
             }
 
             // For nirantara Address
+            if (object.has("naddress")) {
             final JsonArray addressArray = object.get("naddress").getAsJsonArray();
             if (addressArray != null && addressArray.size()>0) {
                 final Set<Address> address = this.clientExtAssembler.assembleAddress(addressArray, newClient);
@@ -280,8 +281,10 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                     newClient.updateAddressExt(address);
                 }
             }
+            }
 
             // For nirantara familyDetails
+            if (object.has("familyDetails")) {
             final JsonArray familyDetailsArray = object.get("familyDetails").getAsJsonArray();
             if (familyDetailsArray != null && familyDetailsArray.size() > 0) {
                 List<FamilyDetails> familyDetails = this.clientExtAssembler.assembleFamilyDetails(familyDetailsArray, newClient);
@@ -289,11 +292,13 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                     newClient.updateFamilyDetails(familyDetails);
                 }
             }
+            }
 
             // For nirantara ClientIdentifierWritePlatformService
             this.clientIdentifierWritePlatformService.addClientIdentifierService(newClient, command);
 
             // Occupation Details
+            if (object.has("cfaOccupations")) {
             final JsonArray occupationDetailsArray = object.get("cfaOccupations").getAsJsonArray();
             if (occupationDetailsArray != null && occupationDetailsArray.size() > 0) {
                 List<OccupationDetails> occupationDetails = this.clientExtAssembler.assembleOccupationDetails(occupationDetailsArray,
@@ -302,14 +307,17 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
                     newClient.updateOccupationDetails(occupationDetails);
                 }
             }
+            }
 
             // For nirantara Nominee Details
+            if (object.has("nomineeDetails")) {
             final JsonArray nomineeDetailsArray = object.get("nomineeDetails").getAsJsonArray();
             if (nomineeDetailsArray != null && nomineeDetailsArray.size() > 0) {
                 List<NomineeDetails> nomineeDetails = this.clientExtAssembler.assembleNomineeDetails(nomineeDetailsArray, newClient);
                 if (nomineeDetails != null && nomineeDetails.size() > 0) {
                     newClient.updateNomineeDetails(nomineeDetails);
                 }
+            }
             }
 
             final Locale locale = command.extractLocale();
@@ -524,7 +532,7 @@ public class ClientWritePlatformServiceJpaRepositoryImpl implements ClientWriteP
         if (client.isActive() && client.SavingsProduct() != null) {
             SavingsAccountDataDTO savingsAccountDataDTO = new SavingsAccountDataDTO(client, null, client.SavingsProduct(),
                     client.getActivationLocalDate(), client.activatedBy(), fmt);
-            commandProcessingResult = this.savingsApplicationProcessWritePlatformService.createActiveApplication(savingsAccountDataDTO);
+            commandProcessingResult = this.savingsApplicationProcessWritePlatformService.createActiveApplication(savingsAccountDataDTO ,true, null);
             if (commandProcessingResult.getSavingsId() != null) {
                 SavingsAccount savingsAccount = this.savingsRepository.findOne(commandProcessingResult.getSavingsId());
                 client.updateSavingsAccount(savingsAccount);

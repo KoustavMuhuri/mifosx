@@ -15,9 +15,11 @@ import org.mifosplatform.batch.domain.BatchRequest;
 import org.mifosplatform.batch.domain.BatchResponse;
 import org.mifosplatform.infrastructure.core.serialization.FromJsonHelper;
 import org.mifosplatform.integrationtests.common.BatchHelper;
+import org.mifosplatform.integrationtests.common.ClientHelper;
 import org.mifosplatform.integrationtests.common.Utils;
 import org.mifosplatform.integrationtests.common.loans.LoanProductTestBuilder;
 import org.mifosplatform.integrationtests.common.loans.LoanTransactionHelper;
+import org.mifosplatform.integrationtests.common.organisation.StaffHelper;
 import org.mifosplatform.integrationtests.common.savings.SavingsProductHelper;
 
 import com.google.gson.JsonElement;
@@ -230,6 +232,140 @@ public class BatchApiTest {
 
         Assert.assertEquals("Verify Status Code 200" + clientId.getAsString(), 200L, (long) response.get(1).getStatusCode());
     }
+    
+    @Test
+    public void creatingSavingsAccount() {
+    	 final SavingsProductHelper savingsProductHelper = new SavingsProductHelper();
+         final String savingsProductJSON = savingsProductHelper //
+                 .withInterestCompoundingPeriodTypeAsDaily() //
+                 .withInterestPostingPeriodTypeAsMonthly() //
+                 .withInterestCalculationPeriodTypeAsDailyBalance() //
+                 .build();
+
+         final Integer productId = SavingsProductHelper.createSavingsProduct(savingsProductJSON, this.requestSpec, this.responseSpec);
+         Integer fieldOfficerId = StaffHelper.createStaff(this.requestSpec, this.responseSpec);  
+         final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec);
+         boolean isactive = false;
+         final BatchRequest br1 = BatchHelper.createSavingsAccountRequest(0L, new Long(productId), new Long(fieldOfficerId), new Long(clientID),isactive);
+
+         
+         final List<BatchRequest> batchRequests = new ArrayList<>();
+
+         batchRequests.add(br1);
+         
+         final String jsonifiedRequest = BatchHelper.toJsonString(batchRequests);
+         
+         @SuppressWarnings("unused")
+		final List<BatchResponse> response = BatchHelper.postBatchRequestsWithoutEnclosingTransaction(this.requestSpec, this.responseSpec,
+                 jsonifiedRequest);
+         @SuppressWarnings("unused")
+		final JsonElement clientId = new FromJsonHelper().parse(response.get(0).getBody()).getAsJsonObject().get("clientId");
+         if(clientId.toString().equals(clientID.toString())){
+        	 final JsonElement savingsId = new FromJsonHelper().parse(response.get(0).getBody()).getAsJsonObject().get("savingsId");
+        	 System.out.println("Savings Id is successfully created whose id is "+savingsId);
+         }  
+    }
+    
+    @Test
+    public void creatingSavingsAccountWithOpeningBalance() {
+    	 final SavingsProductHelper savingsProductHelper = new SavingsProductHelper();
+         final String savingsProductJSON = savingsProductHelper //
+                 .withInterestCompoundingPeriodTypeAsDaily() //
+                 .withInterestPostingPeriodTypeAsMonthly() //
+                 .withInterestCalculationPeriodTypeAsDailyBalance() //
+                 .withMinimumOpenningBalance("5000").build();
+
+         final Integer productId = SavingsProductHelper.createSavingsProduct(savingsProductJSON, this.requestSpec, this.responseSpec);
+         Integer fieldOfficerId = StaffHelper.createStaff(this.requestSpec, this.responseSpec);  
+         final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec);
+         boolean isactive = false;
+         final BatchRequest br1 = BatchHelper.createSavingsAccountRequest(0L, new Long(productId), new Long(fieldOfficerId), new Long(clientID),isactive);
+
+         
+         final List<BatchRequest> batchRequests = new ArrayList<>();
+
+         batchRequests.add(br1);
+         
+         final String jsonifiedRequest = BatchHelper.toJsonString(batchRequests);
+         
+         @SuppressWarnings("unused")
+		final List<BatchResponse> response = BatchHelper.postBatchRequestsWithoutEnclosingTransaction(this.requestSpec, this.responseSpec,
+                 jsonifiedRequest);
+         @SuppressWarnings("unused")
+		final JsonElement clientId = new FromJsonHelper().parse(response.get(0).getBody()).getAsJsonObject().get("clientId");
+         if(clientId.toString().equals(clientID.toString())){
+        	 final JsonElement savingsId = new FromJsonHelper().parse(response.get(0).getBody()).getAsJsonObject().get("savingsId");
+        	 System.out.println("Savings Id is successfully created whose id is "+savingsId);
+         }  
+    }
+    
+    @Test
+    public void activatingSavingsAccount() {
+    	 final SavingsProductHelper savingsProductHelper = new SavingsProductHelper();
+         final String savingsProductJSON = savingsProductHelper //
+                 .withInterestCompoundingPeriodTypeAsDaily() //
+                 .withInterestPostingPeriodTypeAsMonthly() //
+                 .withInterestCalculationPeriodTypeAsDailyBalance() //
+                 .build();
+
+         final Integer productId = SavingsProductHelper.createSavingsProduct(savingsProductJSON, this.requestSpec, this.responseSpec);
+         Integer fieldOfficerId = StaffHelper.createStaff(this.requestSpec, this.responseSpec);  
+         final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec);
+         boolean isactive = true;
+         final BatchRequest br1 = BatchHelper.createSavingsAccountRequest(0L, new Long(productId), new Long(fieldOfficerId), new Long(clientID),isactive);
+
+         
+         final List<BatchRequest> batchRequests = new ArrayList<>();
+
+         batchRequests.add(br1);
+         
+         final String jsonifiedRequest = BatchHelper.toJsonString(batchRequests);
+         
+         @SuppressWarnings("unused")
+		final List<BatchResponse> response = BatchHelper.postBatchRequestsWithoutEnclosingTransaction(this.requestSpec, this.responseSpec,
+                 jsonifiedRequest);
+         @SuppressWarnings("unused")
+		final JsonElement clientId = new FromJsonHelper().parse(response.get(0).getBody()).getAsJsonObject().get("clientId");
+         if(clientId.toString().equals(clientID.toString())){
+        	 final JsonElement savingsId = new FromJsonHelper().parse(response.get(0).getBody()).getAsJsonObject().get("savingsId");
+        	 System.out.println("Savings Id is successfully created whose id is "+savingsId);
+         }  
+    }
+    
+    @Test
+    public void savingsAccountWithoutFieldOfficer() {
+    	 final SavingsProductHelper savingsProductHelper = new SavingsProductHelper();
+         final String savingsProductJSON = savingsProductHelper //
+                 .withInterestCompoundingPeriodTypeAsDaily() //
+                 .withInterestPostingPeriodTypeAsMonthly() //
+                 .withInterestCalculationPeriodTypeAsDailyBalance() //
+                 .build();
+
+         final Integer productId = SavingsProductHelper.createSavingsProduct(savingsProductJSON, this.requestSpec, this.responseSpec);
+         Long  fieldOfficerId = null;
+         final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec);
+         boolean isactive = true;
+         final BatchRequest br1 = BatchHelper.createSavingsAccountRequest(0L, new Long(productId), fieldOfficerId, new Long(clientID),isactive);
+
+         
+         final List<BatchRequest> batchRequests = new ArrayList<>();
+
+         batchRequests.add(br1);
+         
+         final String jsonifiedRequest = BatchHelper.toJsonString(batchRequests);
+         
+         @SuppressWarnings("unused")
+		final List<BatchResponse> response = BatchHelper.postBatchRequestsWithoutEnclosingTransaction(this.requestSpec, this.responseSpec,
+                 jsonifiedRequest);
+         @SuppressWarnings("unused")
+		final JsonElement clientId = new FromJsonHelper().parse(response.get(0).getBody()).getAsJsonObject().get("clientId");
+         if(clientId.toString().equals(clientID.toString())){
+        	 final JsonElement savingsId = new FromJsonHelper().parse(response.get(0).getBody()).getAsJsonObject().get("savingsId");
+        	 System.out.println("Savings Id is successfully created whose id is "+savingsId);
+         }  
+    }
+    
+    
 
     /**
      * Tests that a new savings accounts was applied to an existing client and a

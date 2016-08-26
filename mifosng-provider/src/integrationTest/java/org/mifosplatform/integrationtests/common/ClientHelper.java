@@ -40,7 +40,7 @@ public class ClientHelper {
     }
 
     public static Integer createClient(final RequestSpecification requestSpec, final ResponseSpecification responseSpec) {
-        return createClient(requestSpec, responseSpec, "04 March 2011");
+        return createClient(requestSpec, responseSpec, "04 March 2014");
     }
 
     public static Integer createClient(final RequestSpecification requestSpec, final ResponseSpecification responseSpec,

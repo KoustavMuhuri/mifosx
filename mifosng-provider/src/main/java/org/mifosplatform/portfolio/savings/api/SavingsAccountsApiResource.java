@@ -37,6 +37,9 @@ import org.mifosplatform.infrastructure.core.serialization.DefaultToApiJsonSeria
 import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.security.service.PlatformSecurityContext;
 import org.mifosplatform.infrastructure.core.service.SearchParameters;
+import org.mifosplatform.portfolio.group.data.CenterData;
+import org.mifosplatform.portfolio.group.service.CenterReadPlatformService;
+import org.mifosplatform.portfolio.group.service.GroupReadPlatformService;
 import org.mifosplatform.portfolio.savings.DepositAccountType;
 import org.mifosplatform.portfolio.savings.SavingsApiConstants;
 import org.mifosplatform.portfolio.savings.data.SavingsAccountChargeData;
@@ -79,9 +82,8 @@ public class SavingsAccountsApiResource {
     @Path("template")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String template(@QueryParam("clientId") final Long clientId, @QueryParam("groupId") final Long groupId,
-            @QueryParam("productId") final Long productId,
-            @DefaultValue("false") @QueryParam("staffInSelectedOfficeOnly") final boolean staffInSelectedOfficeOnly,
+    public String template(@QueryParam("clientId") final Long clientId, @QueryParam("groupId") final Long groupId, @QueryParam("centerId") final Long centerId,
+            @QueryParam("productId") final Long productId,@DefaultValue("false") @QueryParam("staffInSelectedOfficeOnly") final boolean staffInSelectedOfficeOnly,
             @Context final UriInfo uriInfo) {
 
         this.context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_ACCOUNT_RESOURCE_NAME);
@@ -92,6 +94,8 @@ public class SavingsAccountsApiResource {
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, savingsAccount, SavingsApiConstants.SAVINGS_ACCOUNT_RESPONSE_DATA_PARAMETERS);
     }
+    
+    
 
     @GET
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -123,6 +127,20 @@ public class SavingsAccountsApiResource {
 
         return this.toApiJsonSerializer.serialize(result);
     }
+    
+    @POST
+    @Path("bulkSavingsSubmit")
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    public String submitBulkApplication(final String apiRequestBodyAsJson){
+    	
+    	  final CommandWrapper commandRequest = new CommandWrapperBuilder().createBulkSavings().withJson(apiRequestBodyAsJson).build();
+
+          final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+
+          return this.toApiJsonSerializer.serialize(result);
+    }
+    	
 
     @GET
     @Path("{accountId}")
@@ -185,7 +203,7 @@ public class SavingsAccountsApiResource {
         SavingsAccountData templateData = null;
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         if (settings.isTemplate()) {
-            templateData = this.savingsAccountReadPlatformService.retrieveTemplate(savingsAccount.clientId(), savingsAccount.groupId(),
+            templateData = this.savingsAccountReadPlatformService.retrieveTemplate(savingsAccount.clientId(), savingsAccount.groupId(), 
                     savingsAccount.productId(), staffInSelectedOfficeOnly);
         }
 

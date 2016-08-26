@@ -27,6 +27,7 @@ import org.mifosplatform.infrastructure.core.data.PaginationParameters;
 import org.mifosplatform.infrastructure.core.data.PaginationParametersDataValidator;
 import org.mifosplatform.infrastructure.core.domain.JdbcSupport;
 import org.mifosplatform.infrastructure.core.exception.PlatformApiDataValidationException;
+import org.mifosplatform.infrastructure.core.service.DateUtils;
 import org.mifosplatform.infrastructure.core.service.Page;
 import org.mifosplatform.infrastructure.core.service.PaginationHelper;
 import org.mifosplatform.infrastructure.core.service.RoutingDataSource;
@@ -49,6 +50,7 @@ import org.mifosplatform.portfolio.group.data.StaffCenterData;
 import org.mifosplatform.portfolio.group.domain.GroupTypes;
 import org.mifosplatform.portfolio.group.domain.GroupingTypeEnumerations;
 import org.mifosplatform.portfolio.group.exception.CenterNotFoundException;
+import org.mifosplatform.portfolio.savings.data.SavingsAccountData;
 import org.mifosplatform.useradministration.domain.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -561,5 +563,27 @@ public class CenterReadPlatformServiceImpl implements CenterReadPlatformService 
         if (!dataValidationErrors.isEmpty()) { throw new PlatformApiDataValidationException("validation.msg.validation.errors.exist",
                 "Validation errors exist.", dataValidationErrors); }
 
+    }
+    @Override
+    public CenterData retrieveCenterAndMembersDetailsTemplate(final Long centerId) {
+        Collection<GroupGeneralData> groups = null;
+        CenterData centerAccount = this.retrieveOne(centerId);
+        // get group associations
+            groups = this.retrieveAssociatedGroups(centerId);
+            /*attach group members in group */
+            ArrayList<GroupGeneralData> groupsToAssociateClient =(ArrayList<GroupGeneralData>) groups;
+            for(GroupGeneralData groupGeneralData :groupsToAssociateClient){
+            ArrayList<ClientData> membersOfGroup=(ArrayList<ClientData>) clientReadPlatformService.retrieveActiveClientMembersOfGroup(groupGeneralData.getId());
+            groupGeneralData.update(membersOfGroup);
+            if (!CollectionUtils.isEmpty(membersOfGroup)) {
+                membersOfGroup = null;
+                final CalendarData collectionMeetingCalendar = null;
+                centerAccount = CenterData.withAssociations(centerAccount, groups, collectionMeetingCalendar);
+
+            }      
+           
+        }        
+
+        return centerAccount;
     }
 }
